@@ -1,0 +1,47 @@
+{% extends 'mainapp/base.html' %}
+
+{% block content %}
+<div style="background: #fff; padding: 30px; border-radius: 12px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); margin-bottom: 40px;">
+    <h2 style="font-size: 28px; font-weight: 700; margin-bottom: 10px; color: #1e293b;">Головна сторінка магазину</h2>
+    <p style="color: #64748b; font-size: 16px; line-height: 1.6;">Вітаємо у нашій книжковій крамниці! Тут ви знайдете найкращі книги.</p>
+</div>
+
+<h3 style="font-size: 22px; font-weight: 600; color: #1e293b; margin-bottom: 20px;">🔥 Всі книги в наявності:</h3>
+
+<div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 30px; margin-top: 25px;">
+    {% for product in products %}
+        <div style="background: #fff; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05); border: 1px solid #e2e8f0; display: flex; flex-direction: column; min-height: 500px;">
+
+            <div style="width: 100%; height: 260px; background-color: #f8fafc; display: flex; align-items: center; justify-content: center; padding: 15px; box-sizing: border-box; border-bottom: 1px solid #e2e8f0;">
+                {% if product.image %}
+                    <img src="{{ product.image.url }}" alt="{{ product.title }}" style="max-width: 100%; max-height: 100%; object-fit: contain;">
+                {% else %}
+                    <div style="color: #94a3b8; font-size: 14px; font-weight: 500;">📖 Немає обкладинки</div>
+                {% endif %}
+            </div>
+
+            <div style="padding: 20px; display: flex; flex-direction: column; flex-grow: 1; box-sizing: border-box;">
+                <h4 style="font-size: 16px; font-weight: 700; margin-bottom: 8px; line-height: 1.4;">
+                    <a href="{% url 'product_detail' product.id %}" style="color: #1e293b; text-decoration: none;">
+                        {{ product.title }}
+                    </a>
+                </h4>
+
+                <p style="color: #64748b; font-size: 14px; line-height: 1.5; margin-bottom: 15px;">
+                    {{ product.description|truncatewords:12 }}
+                </p>
+
+                <div style="font-size: 18px; font-weight: 700; color: #0ea5e9; margin-top: auto; margin-bottom: 15px;">
+                    Ціна: {{ product.price }} грн
+                </div>
+
+                <a href="{% url 'product_detail' product.id %}" class="btn btn-primary" style="width: 100%; text-decoration: none; display: block; text-align: center; box-sizing: border-box; padding: 10px; border-radius: 6px; font-weight: 600;">
+                    Детальніше
+                </a>
+            </div>
+        </div>
+    {% empty %}
+        <p style="color: #64748b; grid-column: 1 / -1; text-align: center;">Книг поки немає в наявності.</p>
+    {% endfor %}
+</div>
+{% endblock %}

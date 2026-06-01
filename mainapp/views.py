@@ -1,15 +1,155 @@
-from django.shortcuts import render
+from django.shortcuts import render, redirect
+from django.db.models import Avg
+from .models import Category, Product, Review, Newsletter
 
-def home(request):
-    context = {
-        'title': 'Головна сторінка Лаби 3',
-        'message': 'Це контент, переданий через контекст!'
-    }
-    return render(request, 'mainapp/index.html', context)
 
-def other_page(request):
+def home_view(request):
+    categories = Category.objects.all()
+    products = Product.objects.all()
+
+    if request.method == 'POST' and 'email_subscribe' in request.POST:
+        email = request.POST.get('email')
+        if email:
+            Newsletter.objects.get_or_create(email=email)
+        return redirect('home')
+
     context = {
-        'title': 'Друга сторінка',
-        'message': 'Ви перейшли сюди через Django views.'
+        'categories': categories,
+        'products': products,
+        'text_content': 'Вітаємо у нашій книжковій крамниці! Тут ви знайдете найкращі книги.'
     }
-    return render(request, 'mainapp/other.html', context)
+    return render(request, 'mainapp/home.html', context)
+
+
+def category_view(request, category_id):
+    categories = Category.objects.all()
+    current_category = Category.objects.get(id=category_id)
+    products = Product.objects.filter(category=current_category)
+    context = {
+        'categories': categories,
+        'current_category': current_category,
+        'products': products
+    }
+    return render(request, 'mainapp/category.html', context)
+
+
+def product_view(request, product_id):
+    categories = Category.objects.all()
+    product = Product.objects.get(id=product_id)
+
+    if request.method == 'POST' and 'submit_rating' in request.POST:
+        rating = request.POST.get('rating')
+        comment = request.POST.get('comment', '')
+        if rating:
+            Review.objects.create(product=product, rating=int(rating), comment=comment)
+        return redirect('product_detail', product_id=product.id)
+
+    average_rating = product.reviews.aggregate(Avg('rating'))['rating__avg']
+    if average_rating:
+        average_rating = round(average_rating, 1)
+    else:
+        average_rating = "Немає оцінок"
+
+    context = {
+        'categories': categories,
+        'product': product,
+        'average_rating': average_rating,
+        'reviews': product.reviews.all().order_by('-created_at')
+    }
+    return render(request, 'mainapp/product_detail.html', context)
+from django.contrib.auth import login, authenticate, logout
+from django.contrib.auth.models import User
+
+def register_view(request):
+    categories = Category.objects.all()
+    if request.method == 'POST':
+        username = request.POST.get('username')
+        email = request.POST.get('email')
+        password = request.POST.get('password')
+        if username and password:
+            user = User.objects.create_user(username=username, email=email, password=password)
+            login(request, user)
+            return redirect('home')
+    return render(request, 'mainapp/register.html', {'categories': categories})
+
+def login_view(request):
+    categories = Category.objects.all()
+    if request.method == 'POST':
+        username = request.POST.get('username')
+        password = request.POST.get('password')
+        user = authenticate(request, username=username, password=password)
+        if user is not None:
+            login(request, user)
+            return redirect('home')
+    return render(request, 'mainapp/login.html', {'categories': categories})
+
+def logout_view(request):
+    logout(request)
+    return redirect('home')
+
+def profile_view(request):
+    categories = Category.objects.all()
+    if not request.user.is_authenticated:
+        return redirect('login')
+    return render(request, 'mainapp/profile.html', {'categories': categories})
+
+
+from django.shortcuts import get_object_or_404
+
+
+def cart_detail_view(request):
+    categories = Category.objects.all()
+    cart = request.session.get('cart', {})
+
+    cart_items = []
+    total_price = 0
+
+    # Збираємо товари з бази даних на основі ID, які лежать у сесії
+    for product_id, item_data in cart.items():
+        product = get_object_or_404(Product, id=product_id)
+        quantity = item_data['quantity']
+        item_total = product.price * quantity
+        total_price += item_total
+
+        cart_items.append({
+            'product': product,
+            'quantity': quantity,
+            'item_total': item_total
+        })
+
+    context = {
+        'categories': categories,
+        'cart_items': cart_items,
+        'total_price': total_price
+    }
+    return render(request, 'mainapp/cart.html', context)
+
+
+def cart_add_view(request, product_id):
+    cart = request.session.get('cart', {})
+    product_id_str = str(product_id)
+
+    if product_id_str not in cart:
+        cart[product_id_str] = {'quantity': 1}
+    else:
+        cart[product_id_str]['quantity'] += 1
+
+    request.session['cart'] = cart
+    return redirect('cart_detail')
+
+
+def cart_remove_view(request, product_id):
+    cart = request.session.get('cart', {})
+    product_id_str = str(product_id)
+
+    if product_id_str in cart:
+        del cart[product_id_str]
+
+    request.session['cart'] = cart
+    return redirect('cart_detail')
+
+
+def cart_clear_view(request):
+    if 'cart' in request.session:
+        del request.session['cart']
+    return redirect('cart_detail')

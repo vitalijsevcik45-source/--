@@ -1,0 +1,95 @@
+{% extends 'mainapp/base.html' %}
+
+{% block content %}
+<div style="margin-bottom: 20px;">
+    <a href="{% url 'home' %}" style="text-decoration: none; color: #64748b; font-weight: 500; font-size: 14px; display: inline-flex; align-items: center; gap: 5px;">
+        ← Назад до каталогу
+    </a>
+</div>
+
+<div style="display: flex; gap: 40px; background: #fff; padding: 40px; border-radius: 12px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); color: #1e293b; flex-wrap: wrap;">
+<div style="flex: 1; min-width: 300px; max-width: 400px;">
+        <div style="width: 100%; height: 500px; background-color: #f8fafc; border-radius: 8px; overflow: hidden; display: flex; align-items: center; justify-content: center; border: 1px solid #e2e8f0; padding: 15px;">
+            {% if product.image %}
+                <img src="{{ product.image.url }}" alt="{{ product.title }}" style="max-width: 100%; max-height: 100%; object-fit: contain;">
+            {% else %}
+                <div style="color: #94a3b8; font-size: 16px; font-weight: 500;">📖 Обкладинка відсутня</div>
+            {% endif %}
+        </div>
+    </div>    </div>
+
+    <div style="flex: 1.5; min-width: 300px; display: flex; flex-direction: column;">
+        <h2 style="font-size: 32px; font-weight: 700; margin-bottom: 10px; line-height: 1.2;">{{ product.title }}</h2>
+
+        <div style="display: flex; align-items: center; gap: 15px; margin-bottom: 20px;">
+            <span style="background: #e0f2fe; color: #0369a1; padding: 4px 12px; border-radius: 20px; font-size: 13px; font-weight: 600;">
+                {{ product.category.name }}
+            </span>
+            <span style="color: #f59e0b; font-weight: 600; display: inline-flex; align-items: center; gap: 4px;">
+                ⭐ Середня оцінка: {{ average_rating }}
+            </span>
+        </div>
+
+        <div style="font-size: 28px; font-weight: 700; color: #0ea5e9; margin-bottom: 25px;">
+            {{ product.price }} грн
+        </div>
+
+        <div style="margin-bottom: 30px;">
+            <h4 style="font-size: 16px; font-weight: 600; margin-bottom: 8px; color: #475569;">Опис книги:</h4>
+            <p style="color: #64748b; font-size: 15px; line-height: 1.6; white-space: pre-line;">
+                {% if product.description %}{{ product.description }}{% else %}Опис для цієї книги поки що відсутній. Напишіть адміністратору для уточнення деталей.{% endif %}
+            </p>
+        </div>
+
+        <div style="margin-top: auto; margin-bottom: 20px;">
+            <a href="{% url 'cart_add' product.id %}" class="btn btn-primary" style="padding: 15px 30px; font-size: 16px; display: inline-flex; align-items: center; gap: 10px; border-radius: 8px; box-shadow: 0 4px 14px rgba(14, 165, 233, 0.4); text-decoration: none; color: white;">
+                🛒 Додати в кошик
+            </a>
+        </div>
+    </div>
+</div>
+
+<div style="margin-top: 40px; background: #fff; padding: 30px; border-radius: 12px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); color: #1e293b;">
+    <h3 style="font-size: 20px; font-weight: 700; margin-bottom: 20px; border-bottom: 2px solid #f1f5f9; padding-bottom: 10px;">
+        💬 Відгуки та оцінки користувачів
+    </h3>
+
+    <div style="background: #f8fafc; padding: 20px; border-radius: 8px; border: 1px solid #e2e8f0; margin-bottom: 30px;">
+        <h4 style="font-size: 16px; font-weight: 600; margin-bottom: 15px;">Залишити свій відгук:</h4>
+        <form method="post">
+            {% csrf_token %}
+            <div style="margin-bottom: 15px;">
+                <label for="rating" style="font-size: 14px; font-weight: 500; color: #475569;">Ваша оцінка: </label>
+                <select name="rating" id="rating" style="padding: 8px 12px; border-radius: 6px; border: 1px solid #cbd5e1; background: #fff; outline: none; margin-left: 10px; font-weight: 500;">
+                    <option value="5">5 ★★★★★ (Відмінно)</option>
+                    <option value="4">4 ★★★★ (Добре)</option>
+                    <option value="3">3 ★★★ (Задовільно)</option>
+                    <option value="2">2 ★★ (Погано)</option>
+                    <option value="1">1 ★ (Жахливо)</option>
+                </select>
+            </div>
+            <div style="margin-bottom: 15px;">
+                <textarea name="comment" placeholder="Напишіть вашу думку про книгу..." required style="width: 100%; height: 80px; padding: 12px; border-radius: 6px; border: 1px solid #cbd5e1; outline: none; font-size: 14px; resize: none;"></textarea>
+            </div>
+            <button type="submit" name="submit_rating" class="btn btn-primary" style="background-color: #10b981; padding: 10px 20px; border-radius: 6px; color: white; border: none; font-weight: 600; cursor: pointer;">
+                Надіслати відгук
+            </button>
+        </form>
+    </div>
+
+    <div>
+        <h4 style="font-size: 16px; font-weight: 600; margin-bottom: 15px; color: #475569;">Усі відгуки:</h4>
+        {% for rev in reviews %}
+            <div style="border-bottom: 1px solid #f1f5f9; padding: 15px 0;">
+                <div style="display: flex; justify-content: space-between; margin-bottom: 5px;">
+                    <strong style="color: #f59e0b; font-size: 14px;">Оцінка: {{ rev.rating }}/5 ★</strong>
+                    <span style="color: #94a3b8; font-size: 12px;">{{ rev.created_at|date:"d.m.Y H:i" }}</span>
+                </div>
+                <p style="color: #475569; font-size: 14px; line-height: 1.5;">{{ rev.comment }}</p>
+            </div>
+        {% empty %}
+            <p style="color: #94a3b8; font-size: 14px; text-align: center; padding: 20px 0;">Відгуків про цю книгу ще немає. Будьте першим, хто залишить оцінку!</p>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

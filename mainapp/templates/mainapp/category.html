@@ -1,0 +1,29 @@
+{% extends 'mainapp/base.html' %}
+
+{% block content %}
+<div style="margin-bottom: 30px;">
+    <h2 style="font-size: 26px; font-weight: 700; color: #1e293b;">Категорія: <span style="color: #0ea5e9;">{{ current_category.name }}</span></h2>
+    <p style="color: #64748b; margin-top: 5px;">Знайдено книг у цій категорії: {{ products.count }}</p>
+</div>
+
+<div class="product-grid">
+    {% for product in products %}
+        <div class="product-card">
+            <div class="product-image-wrapper">
+                {% if product.image %}
+                    <img src="{{ product.image.url }}" alt="{{ product.title }}">
+                {% else %}
+                    <div style="color: #94a3b8; font-size: 14px; font-weight: 500;">📖 Обкладинка відсутня</div>
+                {% endif %}
+            </div>
+            <div class="product-info">
+                <h4><a href="{% url 'product_detail' product.id %}">{{ product.title }}</a></h4>
+                <div class="product-price">{{ product.price }} грн</div>
+                <a href="{% url 'product_detail' product.id %}" class="btn btn-primary" style="width: 100%;">Детальніше</a>
+            </div>
+        </div>
+    {% empty %}
+        <p style="color: #64748b; grid-column: 1/-1;">У цій категорії книг поки немає.</p>
+    {% endfor %}
+</div>
+{% endblock %}

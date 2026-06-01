@@ -1,0 +1,71 @@
+{% extends 'mainapp/base.html' %}
+
+{% block content %}
+<div style="background: #fff; padding: 30px; border-radius: 12px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); color: #1e293b;">
+    <h2 style="font-size: 26px; font-weight: 700; margin-bottom: 25px; display: flex; align-items: center; gap: 10px;">
+        🛒 Ваш кошик покупок
+    </h2>
+
+    {% if cart_items %}
+        <!-- Таблиця товарів у кошику -->
+        <div style="overflow-x: auto;">
+            <table style="width: 100%; border-collapse: collapse; margin-bottom: 30px; text-align: left;">
+                <thead>
+                    <tr style="border-bottom: 2px solid #f1f5f9; color: #64748b; font-size: 14px;">
+                        <th style="padding: 12px;">Книга</th>
+                        <th style="padding: 12px;">Ціна</th>
+                        <th style="padding: 12px;">Кількість</th>
+                        <th style="padding: 12px;">Сума</th>
+                        <th style="padding: 12px; text-align: center;">Дія</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for item in cart_items %}
+                        <tr style="border-bottom: 1px solid #f1f5f9; font-size: 15px;">
+                            <td style="padding: 15px 12px; display: flex; align-items: center; gap: 15px;">
+                                {% if item.product.image %}
+                                    <img src="{{ item.product.image.url }}" style="width: 50px; height: 70px; object-fit: cover; border-radius: 4px; border: 1px solid #e2e8f0;">
+                                {% endif %}
+                                <a href="{% url 'product_detail' item.product.id %}" style="color: #1e293b; text-decoration: none; font-weight: 600;">
+                                    {{ item.product.title }}
+                                </a>
+                            </td>
+                            <td style="padding: 15px 12px;">{{ item.product.price }} грн</td>
+                            <td style="padding: 15px 12px; font-weight: 600; color: #475569;">{{ item.quantity }} шт.</td>
+                            <td style="padding: 15px 12px; font-weight: 700; color: #0ea5e9;">{{ item.item_total }} грн</td>
+                            <td style="padding: 15px 12px; text-align: center;">
+                                <a href="{% url 'cart_remove' item.product.id %}" style="color: #ef4444; text-decoration: none; font-size: 14px; font-weight: 500;">
+                                    ❌ Видалити
+                                </a>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Підсумок кошика -->
+        <div style="display: flex; justify-content: space-between; align-items: center; background: #f8fafc; padding: 20px; border-radius: 8px; border: 1px solid #e2e8f0;">
+            <div>
+                <a href="{% url 'cart_clear' %}" style="color: #64748b; text-decoration: none; font-size: 14px; font-weight: 500;">
+                    🗑️ Очистити кошик
+                </a>
+            </div>
+            <div style="text-align: right;">
+                <div style="font-size: 16px; color: #475569; margin-bottom: 5px;">Разом до сплати:</div>
+                <div style="font-size: 28px; font-weight: 800; color: #0ea5e9; margin-bottom: 15px;">{{ total_price }} грн</div>
+                <button onclick="alert('Дякуємо за замовлення! Менеджер звʼяжеться з вами найближчим часом.')" class="btn btn-primary" style="padding: 12px 30px; font-size: 15px; border-radius: 6px;">
+                    💳 Оформити замовлення
+                </button>
+            </div>
+        </div>
+    {% else %}
+        <!-- Якщо кошик порожній -->
+        <div style="text-align: center; padding: 40px 0; color: #64748b;">
+            <div style="font-size: 48px; margin-bottom: 10px;">🛒</div>
+            <p style="font-size: 16px; margin-bottom: 20px;">Ваш кошик поки що порожній.</p>
+            <a href="{% url 'home' %}" class="btn btn-primary">Перейти до покупок</a>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

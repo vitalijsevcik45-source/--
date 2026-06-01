@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Книжкова Крамниця</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+    <style>
+        /* Глобальні стилі обнулення та шрифтів */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', sans-serif;
+        }
+
+        body {
+            background-color: #f4f6f8;
+            color: #2c3e50;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        /* Шапка сайту (Header) */
+        header {
+            background: linear-gradient(135deg, #1e293b, #0f172a);
+            padding: 20px 40px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        header h1 a {
+            color: #fff;
+            text-decoration: none;
+            font-size: 24px;
+            font-weight: 700;
+            letter-spacing: -0.5px;
+        }
+
+        header h1 a span {
+            color: #38bdf8;
+        }
+
+        /* Навігація */
+        nav {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        nav a {
+            color: #94a3b8;
+            text-decoration: none;
+            font-size: 15px;
+            font-weight: 500;
+            transition: color 0.3s ease, transform 0.2s ease;
+        }
+
+        nav a:hover {
+            color: #fff;
+        }
+
+        /* Розділювач в меню */
+        .nav-divider {
+            height: 20px;
+            width: 1px;
+            background-color: #334155;
+            margin: 0 10px;
+        }
+
+        /* Головний контент */
+        main {
+            flex: 1;
+            max-width: 1200px;
+            width: 100%;
+            margin: 40px auto;
+            padding: 0 20px;
+        }
+
+        /* Стилізація карток та сітки для книг (Головна та Категорії) */
+        .product-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 30px;
+            margin-top: 25px;
+        }
+
+        .product-card {
+            background: #fff;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .product-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+        }
+
+        .product-image-wrapper {
+            width: 100%;
+            height: 340px;
+            background-color: #e2e8f0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+        }
+
+        .product-image-wrapper img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .product-info {
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            flex-grow: 1;
+        }
+
+        .product-info h4 {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .product-info h4 a {
+            color: #1e293b;
+            text-decoration: none;
+            transition: color 0.2s;
+        }
+
+        .product-info h4 a:hover {
+            color: #38bdf8;
+        }
+
+        .product-price {
+            font-size: 20px;
+            font-weight: 700;
+            color: #0ea5e9;
+            margin-top: auto;
+            margin-bottom: 15px;
+        }
+
+        /* Кнопки */
+        .btn {
+            display: inline-block;
+            padding: 10px 20px;
+            border-radius: 6px;
+            font-weight: 600;
+            text-decoration: none;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            border: none;
+            font-size: 14px;
+        }
+
+        .btn-primary {
+            background-color: #0ea5e9;
+            color: #fff;
+        }
+
+        .btn-primary:hover {
+            background-color: #0284c7;
+        }
+
+        .btn-disabled {
+            background-color: #cbd5e1;
+            color: #64748b;
+            cursor: not-allowed;
+        }
+
+        /* Підвал (Footer) */
+        footer {
+            background-color: #0f172a;
+            color: #94a3b8;
+            padding: 40px 20px;
+            text-align: center;
+            margin-top: auto;
+            border-top: 1px solid #1e293b;
+        }
+
+        footer h4 {
+            color: #fff;
+            margin-bottom: 15px;
+            font-weight: 600;
+        }
+
+        footer form input[type="email"] {
+            padding: 12px 16px;
+            width: 300px;
+            border-radius: 8px;
+            border: 1px solid #334155;
+            background-color: #1e293b;
+            color: #fff;
+            font-size: 14px;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+
+        footer form input[type="email"]:focus {
+            border-color: #38bdf8;
+        }
+
+        footer form button {
+            padding: 12px 24px;
+            background-color: #38bdf8;
+            color: #0f172a;
+            border: none;
+            border-radius: 8px;
+            font-weight: 700;
+            cursor: pointer;
+            font-size: 14px;
+            transition: background-color 0.2s;
+        }
+
+        footer form button:hover {
+            background-color: #7dd3fc;
+        }
+
+        footer p {
+            margin-top: 25px;
+            font-size: 13px;
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1><a href="{% url 'home' %}">Book<span>Store</span></a></h1>
+ <nav>
+            <a href="{% url 'home' %}">🏠 Головна</a>
+            {% for cat in categories %}
+                <a href="{% url 'category_detail' cat.id %}">{{ cat.name }}</a>
+            {% endfor %}
+
+            <a href="{% url 'cart_detail' %}" style="margin-left: 10px;">🛒 Кошик</a>
+
+            <div class="nav-divider"></div>
+
+            {% if request.user.is_authenticated %}
+                <a href="{% url 'profile' %}" style="color: #38bdf8; font-weight: 600;">👤 Кабінет ({{ request.user.username }})</a>
+                <a href="{% url 'logout' %}" style="color: #ef4444;">🚪 Вийти</a>
+            {% else %}
+                <a href="{% url 'login' %}">🔑 Увійти</a>
+                <a href="{% url 'register' %}" style="color: #38bdf8; font-weight: 600;">📝 Реєстрація</a>
+            {% endif %}
+        </nav>
+    </header>
+
+    <main>
+        {% block content %}
+        {% endblock %}
+    </main>
+
+    <footer>
+        <div style="max-width: 500px; margin: 0 auto;">
+            <h4>📬 Підписка на новини магазину:</h4>
+            <form method="post" action="{% url 'home' %}" style="display: flex; gap: 10px; justify-content: center;">
+                {% csrf_token %}
+                <input type="email" name="email" placeholder="Введіть ваш Email" required>
+                <button type="submit" name="email_subscribe">Підписатися</button>
+            </form>
+        </div>
+        <p>&copy; 2026 BookStore. Всі права захищені.</p>
+    </footer>
+
+</body>
+</html>
