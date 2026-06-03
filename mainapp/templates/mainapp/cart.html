@@ -44,20 +44,39 @@
             </table>
         </div>
 
-        <!-- Підсумок кошика -->
-        <div style="display: flex; justify-content: space-between; align-items: center; background: #f8fafc; padding: 20px; border-radius: 8px; border: 1px solid #e2e8f0;">
-            <div>
-                <a href="{% url 'cart_clear' %}" style="color: #64748b; text-decoration: none; font-size: 14px; font-weight: 500;">
-                    🗑️ Очистити кошик
-                </a>
+       <div style="background: #f8fafc; padding: 25px; border-radius: 8px; border: 1px solid #e2e8f0; margin-top: 20px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #e2e8f0; padding-bottom: 20px; margin-bottom: 20px;">
+                <div>
+                    <a href="{% url 'cart_clear' %}" style="color: #64748b; text-decoration: none; font-size: 14px; font-weight: 500;">
+                        🗑️ Очистити кошик
+                    </a>
+                </div>
+                <div style="text-align: right;">
+                    <div style="font-size: 16px; color: #475569; margin-bottom: 5px;">Разом до сплати:</div>
+                    <div style="font-size: 28px; font-weight: 800; color: #0ea5e9;">{{ total_price }} грн</div>
+                </div>
             </div>
-            <div style="text-align: right;">
-                <div style="font-size: 16px; color: #475569; margin-bottom: 5px;">Разом до сплати:</div>
-                <div style="font-size: 28px; font-weight: 800; color: #0ea5e9; margin-bottom: 15px;">{{ total_price }} грн</div>
-                <button onclick="alert('Дякуємо за замовлення! Менеджер звʼяжеться з вами найближчим часом.')" class="btn btn-primary" style="padding: 12px 30px; font-size: 15px; border-radius: 6px;">
-                    💳 Оформити замовлення
-                </button>
+
+            <div style="max-width: 450px; margin-left: auto; text-align: left;">
+                <h4 style="margin-top: 0; margin-bottom: 15px; font-size: 16px; font-weight: 600; color: #1e293b;">
+                    📞 Контакти для зв'язку та доставки:
+                </h4>
+                <form action="{% url 'checkout' %}" method="post">
+                    {% csrf_token %}
+                    <div style="margin-bottom: 12px;">
+                        <label style="font-size: 13px; color: #475569; display: block; margin-bottom: 4px;">Ваше Ім'я та Прізвище:</label>
+                        <input type="text" name="customer_name" required placeholder="Іван Іванов" style="width: 100%; padding: 10px; border: 1px solid #cbd5e1; border-radius: 6px; box-sizing: border-box; font-size: 14px;">
+                    </div>
+                    <div style="margin-bottom: 20px;">
+                        <label style="font-size: 13px; color: #475569; display: block; margin-bottom: 4px;">Номер телефону:</label>
+                        <input type="text" name="phone" required placeholder="+380..." style="width: 100%; padding: 10px; border: 1px solid #cbd5e1; border-radius: 6px; box-sizing: border-box; font-size: 14px;">
+                    </div>
+                    <button type="submit" class="btn btn-primary" style="width: 100%; padding: 12px; font-weight: 600; font-size: 15px; border-radius: 6px; cursor: pointer; border: none; text-align: center;">
+                        🚀 Надіслати замовлення
+                    </button>
+                </form>
             </div>
+        </div>
         </div>
     {% else %}
         <!-- Якщо кошик порожній -->

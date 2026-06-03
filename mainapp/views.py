@@ -1,7 +1,12 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from django.db.models import Avg
-from .models import Category, Product, Review, Newsletter
+from django.contrib.auth import login, authenticate, logout
+from django.contrib.auth.models import User
+from django.contrib.auth.decorators import login_required
+from .models import Category, Product, Review, Newsletter, Order, OrderItem
 
+
+# ==================== ГОЛОВНА ТА КАТЕГОРІЇ ====================
 
 def home_view(request):
     categories = Category.objects.all()
@@ -57,8 +62,9 @@ def product_view(request, product_id):
         'reviews': product.reviews.all().order_by('-created_at')
     }
     return render(request, 'mainapp/product_detail.html', context)
-from django.contrib.auth import login, authenticate, logout
-from django.contrib.auth.models import User
+
+
+# ==================== ПРОФІЛЬ ТА АВТЕНТИФІКАЦІЯ ====================
 
 def register_view(request):
     categories = Category.objects.all()
@@ -72,6 +78,7 @@ def register_view(request):
             return redirect('home')
     return render(request, 'mainapp/register.html', {'categories': categories})
 
+
 def login_view(request):
     categories = Category.objects.all()
     if request.method == 'POST':
@@ -83,9 +90,11 @@ def login_view(request):
             return redirect('home')
     return render(request, 'mainapp/login.html', {'categories': categories})
 
+
 def logout_view(request):
     logout(request)
     return redirect('home')
+
 
 def profile_view(request):
     categories = Category.objects.all()
@@ -94,8 +103,7 @@ def profile_view(request):
     return render(request, 'mainapp/profile.html', {'categories': categories})
 
 
-from django.shortcuts import get_object_or_404
-
+# ==================== РОБОТА З КОШИКОМ ====================
 
 def cart_detail_view(request):
     categories = Category.objects.all()
@@ -104,7 +112,6 @@ def cart_detail_view(request):
     cart_items = []
     total_price = 0
 
-    # Збираємо товари з бази даних на основі ID, які лежать у сесії
     for product_id, item_data in cart.items():
         product = get_object_or_404(Product, id=product_id)
         quantity = item_data['quantity']
@@ -152,4 +159,58 @@ def cart_remove_view(request, product_id):
 def cart_clear_view(request):
     if 'cart' in request.session:
         del request.session['cart']
+    return redirect('cart_detail')
+
+
+# ==================== ОФОРМЛЕННЯ ЗАМОВЛЕННЯ ====================
+
+@login_required
+def checkout(request):
+    cart = request.session.get('cart', {})
+    if not cart:
+        return redirect('cart_detail')
+
+    if request.method == 'POST':
+        customer_name = request.POST.get('customer_name')
+        phone = request.POST.get('phone')
+
+        # Вираховуємо суму на основі актуальних цін з бази даних (у типі Decimal)
+        total_price = 0
+        order_items_to_create = []
+
+        for product_id, item_data in cart.items():
+            product = get_object_or_404(Product, id=product_id)
+            quantity = item_data['quantity']
+            total_price += product.price * quantity
+
+            # Тимчасово зберігаємо дані для створення книг у замовленні
+            order_items_to_create.append({
+                'product': product,
+                'price': product.price,
+                'quantity': quantity
+            })
+
+        # Створюємо одне головне замовлення в базі даних
+        order = Order.objects.create(
+            user=request.user,
+            customer_name=customer_name,
+            phone=phone,
+            total_price=total_price
+        )
+
+        # Тепер прив'язуємо всі книги з кошика до цього замовлення
+        for item in order_items_to_create:
+            OrderItem.objects.create(
+                order=order,
+                product=item['product'],
+                price=item['price'],
+                quantity=item['quantity']
+            )
+
+        # Очищаємо кошик у сесії
+        request.session['cart'] = {}
+
+        # Рендеримо сторінку успіху
+        return render(request, 'mainapp/order_success.html', {'order': order})
+
     return redirect('cart_detail')

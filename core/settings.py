@@ -25,7 +25,7 @@ SECRET_KEY = 'django-insecure-ivmppf-3nrqc=lo%r$8d_vzrkuzpx=r8)a98rplhgp02t+#zch
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['*']
 
 
 # Application definition
@@ -84,20 +84,7 @@ DATABASES = {
 # Password validation
 # https://docs.djangoproject.com/en/6.0/ref/settings/#auth-password-validators
 
-AUTH_PASSWORD_VALIDATORS = [
-    {
-        'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
-    },
-    {
-        'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator',
-    },
-    {
-        'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator',
-    },
-    {
-        'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
-    },
-]
+AUTH_PASSWORD_VALIDATORS = []
 
 
 # Internationalization
@@ -118,3 +105,17 @@ USE_TZ = True
 STATIC_URL = 'static/'
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+
+# Налаштування РЕАЛЬНОЇ відправки пошти через твій Gmail
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+EMAIL_HOST_USER = 'vitalijsevcik45@gmail.com'  # 👈 Впиши сюди СВОЮ пошту замість 'твоя_пошта@gmail.com'
+EMAIL_HOST_PASSWORD = 'vnvrgjzmflcyuijp'       # 👈 Твій секретний 16-значний код додатка
+DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
+PASSWORD_RESET_TIMEOUT = 14400  # Лінк на відновлення пароля буде активним 4 години
+# Вказуємо Django, куди перенаправляти неавторизованих користувачів
+LOGIN_URL = 'login'
+# Дозволяємо Django приймати захищені формати (CSRF) від Ngrok
+CSRF_TRUSTED_ORIGINS = ['https://*.ngrok-free.dev']
